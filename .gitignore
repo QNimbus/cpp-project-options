@@ -1,0 +1,4 @@
+# Ignore CMake generated folders
+build/
+bin/
+lib/
