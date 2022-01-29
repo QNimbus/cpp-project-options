@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.16)
 
 set(ProjectOptions_SRC_DIR ${CMAKE_CURRENT_LIST_DIR} CACHE FILEPATH "")
 
+# Include utilities and enforce for out-of-source build
+include("${ProjectOptions_SRC_DIR}/Utilities.cmake")
 include("${ProjectOptions_SRC_DIR}/PreventInSourceBuilds.cmake")
 
 #
@@ -18,6 +20,8 @@ macro(project_options)
       ENABLE_CONAN)
   # set(oneValueArgs MSVC_WARNINGS CLANG_WARNINGS GCC_WARNINGS)
   set(multiValueArgs PCH_HEADERS CONAN_OPTIONS)
+
+  # See: https://cmake.org/cmake/help/latest/command/cmake_parse_arguments.html
   cmake_parse_arguments(
     ProjectOptions
     "${options}"
