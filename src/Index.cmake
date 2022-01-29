@@ -8,6 +8,8 @@ include("${ProjectOptions_SRC_DIR}/PreventInSourceBuilds.cmake")
 
 #
 # Params:
+# - WARNINGS_AS_ERRORS: Treat compiler warnings as errors
+# - ENABLE_CLANG_TIDY: Enable static analysis with clang-tidy
 # - ENABLE_PCH: Enable Precompiled Headers
 # - PCH_HEADERS: the list of the headers to precompile
 # - ENABLE_CONAN: Use Conan for dependency management
@@ -16,6 +18,8 @@ include("${ProjectOptions_SRC_DIR}/PreventInSourceBuilds.cmake")
 # NOTE: cmake-lint [C0103] Invalid macro name "project_options" doesn't match `[0-9A-Z_]+`
 macro(project_options)
   set(options
+      WARNINGS_AS_ERRORS
+      ENABLE_CLANG_TIDY
       ENABLE_PCH
       ENABLE_CONAN)
   # set(oneValueArgs MSVC_WARNINGS CLANG_WARNINGS GCC_WARNINGS)
@@ -29,10 +33,28 @@ macro(project_options)
     "${multiValueArgs}"
     ${ARGN})
 
+  # Set warning message level
+  if(${ProjectOptions_WARNINGS_AS_ERRORS})
+    set(WARNINGS_AS_ERRORS ${ProjectOptions_WARNINGS_AS_ERRORS})
+    
+    # CMake error level
+    set(WARNING_MESSAGE SEND_ERROR)
+  else()
+    # CMake error level
+    set(WARNING_MESSAGE WARNING)
+  endif()
+
   # Link this 'library' to set the C++ standard / compile-time options requested
   add_library(project_options INTERFACE)
 
   include("${ProjectOptions_SRC_DIR}/StandardProjectSettings.cmake")
+
+  # allow for static analysis options
+  include("${ProjectOptions_SRC_DIR}/StaticAnalyzers.cmake")
+
+  if(${ProjectOptions_ENABLE_CLANG_TIDY})
+    enable_clang_tidy()
+  endif()
 
   # Very basic PCH implementation
   if(${ProjectOptions_ENABLE_PCH})
